@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+
+    <style>
+        /* Base Reset & Variables */
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --success-hover: #059669;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+        }
+
+        /* Typography */
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.025em;
+        }
+
+        body > p {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 3rem;
+        }
+
+        /* Responsive Split Layout (PC Setup) */
+        @media (min-width: 1024px) {
+            body {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+            
+            /* Structural wrap created natively via body flow layout adjustments */
+            #task-inpt {
+                position: fixed;
+                width: 360px;
+                left: max(2rem, calc((100vw - 1400px) / 2 + 2rem));
+                top: 180px;
+            }
+
+            #tasks-container {
+                margin-left: 410px !important;
+                margin-top: 0 !important;
+            }
+        }
+
+        /* Form Styling */
+        #task-inpt {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-sizing: border-box;
+        }
+
+        #task-inpt label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: -0.5rem;
+        }
+
+        #task-inpt input[type="text"],
+        #task-inpt select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        #task-inpt input[type="text"]:focus,
+        #task-inpt select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        #task-inpt button[type="submit"] {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.85rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 0.5rem;
+        }
+
+        #task-inpt button[type="submit"]:hover {
+            background-color: var(--primary-hover);
+        }
+
+        #err-container {
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Tasks Layout Target Container */
+        #tasks-container {
+            margin-top: 2rem;
+        }
+
+        /* --- DESKTOP TABLE VIEW CONFIGURATION --- */
+        @media (min-width: 768px) {
+            /* Force the injected cards container layout to act as a structured table */
+            #tasks-container {
+                display: table;
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0 0.75rem; /* Clean split-row appearance */
+            }
+
+            .task-card {
+                display: table-row !important;
+                background: var(--bg-card);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+                transition: transform 0.2s ease;
+            }
+
+            .task-card:hover {
+                transform: scale(1.005);
+            }
+
+            /* Convert child elements cleanly into distinct horizontal table columns */
+            .task-title,
+            .task-description,
+            .task-meta {
+                display: table-cell !important;
+                vertical-align: middle;
+                padding: 1rem;
+                background: var(--bg-card);
+                border-top: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            /* Round edges of individual rows */
+            .task-title {
+                border-left: 1px solid var(--border-color);
+                border-top-left-radius: 10px;
+                border-bottom-left-radius: 10px;
+                font-size: 1.1rem;
+                font-weight: 600;
+                width: 25%;
+            }
+
+            .task-description {
+                width: 40%;
+            }
+
+            .task-meta {
+                border-right: 1px solid var(--border-color);
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+                border-top: 1px solid var(--border-color) !important;
+                padding-top: 1rem !important;
+                margin-top: 0 !important;
+                width: 35%;
+            }
+
+            .task-meta p {
+                display: inline-flex !important;
+                align-items: center;
+                margin-right: 1.5rem !important;
+                gap: 0.35rem;
+            }
+        }
+
+     
+        @media (max-width: 767px) {
+            #tasks-container {
+                display: flex;
+                flex-direction: column;
+                gap: 1.25rem;
+            }
+
+            .task-card {
+                background: var(--bg-card);
+                border: 1px solid var(--border-color);
+                border-radius: 14px;
+                padding: 1.5rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            }
+
+            .task-title {
+                margin: 0;
+                font-size: 1.25rem;
+                font-weight: 700;
+            }
+
+            .task-description {
+                margin: 0;
+                font-size: 0.95rem;
+                color: var(--text-muted);
+            }
+
+            .task-meta {
+                margin-top: 0.5rem;
+                padding-top: 0.75rem;
+                border-top: 1px solid var(--border-color);
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Dynamic Badge Styling for Meta Values */
+        .task-meta strong {
+            color: var(--text-main);
+            font-weight: 600;
+            background: #e2e8f0;
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            text-transform: capitalize;
+        }
+
+        /* --- BUTTON STYLING (Works in both Table & Card views) --- */
+        .complete-btn, 
+        .delete-btn {
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.5rem 0.85rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        #task-action{
+            display: flex;
+            flex-direction: column;
+            
+        }
+
+        .complete-btn {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .complete-btn:hover {
+            background-color: var(--success-hover);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+        }
+
+        .delete-btn {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: var(--danger-hover);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+        }
+
+   
+        .task-meta p:has(.complete-btn),
+        .task-meta p:has(.delete-btn) {
+            margin-right: 0 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Task Manager</h1>
+    <p>Mangage your task efficiently on the go..</p>
+
+
+    
+    <form id="task-inpt">
+        <label for="task-name">Task name : </label>
+        <input type="text" id="tsk-name" name="task-name" required maxlength="100">
+        <br>
+        <label for="task-description">Task description :</label>
+        <input type="text" id="tsk-description" name="task-description">
+        <br>
+        <label for="priority">Priority : </label>
+        <select name="priority" id="slct-priority" required>
+            <option value="">Select</option>
+            <option value="low">Low</option>
+            <option value="moderate">Moderate</option>
+            <option value="high">High</option>
+        </select>
+        <br>
+        <label for="progress">Progress :</label>
+        <select name="progress" id="slct-progress" required>
+            <option value="">Select</option>
+            <option value="not-started">Not started</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="completed">Completed</option>
+        </select>
+        <br>
+        <button type="submit">Submit</button>
+
+        <div id="err-container" style="color: red; font-style: italic;"></div>
+    </form>
+
+    <div id="tasks-container">
+        
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
