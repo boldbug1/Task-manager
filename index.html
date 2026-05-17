@@ -197,6 +197,12 @@
             }
         }
 
+        ::selection{
+            background-color: red;
+            opacity: 0.1;
+            color: white;
+        }
+
      
         @media (max-width: 767px) {
             #tasks-container {
@@ -298,6 +304,78 @@
         .task-meta p:has(.delete-btn) {
             margin-right: 0 !important;
         }
+
+        .toast-container{
+            width: 100%;
+            height: 100%;
+        }
+
+        .toast-msg{
+            width: fit-content;
+            height: fit-content;
+            border-radius: 20px;
+            display: flex;
+            position:fixed;
+            top: 10px;
+            z-index: 1000;
+            right: 10px;
+            align-items: center;
+            justify-content:flex-start;
+            padding: 8px;
+            color: white;
+            background-color: #4338ca;
+            font-weight: bold;
+            animation: slideLeft 0.5s forwards;
+        }
+
+        .toast-msg.end{
+            animation: slideOut 0.5s forwards;
+        }
+
+        .toast-msg.delete{
+            background-color: red;
+        }
+
+        .toast-msg.completed{
+            background-color: rgb(9, 255, 0);
+        }
+
+        @keyframes slideLeft {
+            0%{
+                transform: translateX(1100px);
+                opacity: 0.1;
+            }
+            50%{
+                transform: translateX(10px);
+                opacity: 0.7;
+            }
+            100%{
+                transform: translateX(10px);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            0%{
+                transform: translateX(10px);
+                opacity: 1;
+            }
+            50%{
+                transform: translateX(1100px);
+                opacity: 0.7;
+            }
+            100%{
+                transform: translateX(1100px);
+                opacity: 0.1;
+            }
+        }
+
+
+        .complete-btn:disabled {
+        background-color: green;
+        cursor: not-allowed;
+        opacity: 1;
+        }
     </style>
 </head>
 
@@ -306,6 +384,9 @@
     <p>Mangage your task efficiently on the go..</p>
 
 
+    <div class="toast-container">
+       
+    </div>
     
     <form id="task-inpt">
         <label for="task-name">Task name : </label>

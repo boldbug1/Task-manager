@@ -12,7 +12,9 @@ import {
     clearTasks,
     renderTasks,
     showError,
-    clearError
+    clearError,
+    showToast,
+    clearToast
 } from './ui.js'
 
 loadTasks();
@@ -21,7 +23,7 @@ const form = document.getElementById("task-inpt");
 const taskContainer = document.getElementById("tasks-container");
 
 
-
+// delete task
 taskContainer.addEventListener('click',(event)=>{
         if(!event.target.matches(".delete-btn")){
             return;
@@ -34,12 +36,17 @@ taskContainer.addEventListener('click',(event)=>{
         deleteTask(taskName);
 
         saveTasks();
-        
+        showToast("Task deleted succesfully");
+
+        setTimeout(()=>{
+            clearToast();
+        },3000);
+
         renderTasks(getTasks());
 
     });
 
-
+//complete task
 taskContainer.addEventListener('click',(event)=>{
         if(!event.target.matches(".complete-btn")){
             return;
@@ -49,9 +56,15 @@ taskContainer.addEventListener('click',(event)=>{
 
         const taskName = taskCard.querySelector(".task-title").textContent;
 
-        console.log(`Complete requested for : ${taskName}`);
-
+        
         completeTask(taskName);
+
+        showToast("Hurray!!Task Completed!!");
+
+
+        setTimeout(()=>{
+            clearToast();
+        },3000);
 
         renderTasks(getTasks());
 
@@ -77,7 +90,7 @@ form.addEventListener('submit',(event)=>{
        return;
     } 
     clearError();
-    try{
+  
     const task = createTask(taskName.value , taskDes.value , priority.value , progress.value);
 
     addTask(task);
@@ -86,15 +99,23 @@ form.addEventListener('submit',(event)=>{
     taskDes.value = "";
     priority.value = "";
     progress.value = "";
+    
+    showToast("Task added succesfully");
+
+    setTimeout(()=>{
+            clearToast();
+    },3000);
 
     console.log(task);
     console.log(getTasks);
 
+
+    
     saveTasks();
 
     renderTasks(getTasks());
-    }catch(err){
-        console.log(`Error`,err);
-    }
+    
+
+
    
 });

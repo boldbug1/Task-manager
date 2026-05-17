@@ -33,6 +33,9 @@ export function deleteTask(taskName){
 export function completeTask(taskName) {
   const task = tasks.find(task => task.name === taskName);
 
+  if(task.progress === "completed"){
+    return;
+  }
   if (task) {
     task.progress = "completed";
   }
