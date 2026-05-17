@@ -1,5 +1,5 @@
 # Task Manager
-### Add and track your tasks on the go 
+track your tasks on the go
 
 ## Features -
 - Add tasks
